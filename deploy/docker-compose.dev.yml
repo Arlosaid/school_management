@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  api:
+    ports:
+      # Exposes application port.
+    - "3000:3000"
+    build:
+      target: dev
+    volumes:
+      # Adds current directory as volume.
+    - .:/app/src/
+    environment:
+      # Enables autoreload.
+      SCHOOL_MGT_RELOAD: "True"
