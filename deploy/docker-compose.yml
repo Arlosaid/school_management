@@ -1,0 +1,46 @@
+version: '3.9'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./deploy/Dockerfile
+      target: prod
+    image: school_mgt:${SCHOOL_MGT_VERSION:-latest}
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SCHOOL_HOST: 0.0.0.0
+      SCHOOL_DB_HOST: db
+      SCHOOL_DB_PORT: 5432
+      SCHOOL_DB_USER: school
+      SCHOOL_DB_PASS: school
+      SCHOOL_DB_BASE: school
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "admin"
+      MYSQL_DATABASE: "school"
+      MYSQL_USER: "school"
+      MYSQL_PASSWORD: "school"
+    ports:
+      - "5432:5432"
+    volumes:
+      - school-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+volumes:
+  school-data:
+    name: school-data
+
